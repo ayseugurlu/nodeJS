@@ -1,14 +1,14 @@
 {
-  "name": "04-nodejs-setup",
+  "name": "setup-nodejs",
   "version": "1.0.0",
-  "description": "--\r # NodeJS",
+  "description": "this is a node setup class",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "Clarusway",
+  "author": "ayse",
   "license": "ISC",
+  "keywords": [],
   "dependencies": {
     "express": "^4.21.1"
   },
