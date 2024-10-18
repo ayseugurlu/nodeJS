@@ -1,53 +1,49 @@
-'use strict'
-
-/*----------------------------*/ 
+"use strict"
+/* -------------------------------------------- *
+                    MODULES
+/* -------------------------------------------- */
+// Dosyayı içe aktarma:
 
 // require('./modules/index.js')
 // require('./modules/index')
-//  require('./modules')
+// require('./modules/') // default file name: index
 
- //! yukardaki sekillerde import edebiliriz dosya adi index oldugundan 3. secenekteki gibi dosya adini yazmasak bile oluyor. index default cünkü
+/* -------------------------------------------- */
+// Import from Export
 
- /* ----------------------------*/
+// const test = require('./modules/')
+// test()
 
-//  const test = require('./modules')
+// require('./modules/')()
 
-//  test()
+/* -------------------------------------------- */
 
-
- /*------------------------*/
-
-// const arrFunc = require ('./modules/index')
-
+// const arrFunc = require('./modules/')
+// // console.log(arrFunc)
 // arrFunc[0]()
 // arrFunc[1]()
 // arrFunc[2]()
 
-
- /*------------------------*/
-
-// const [test1, test2, test3] = require('./modules/index')
+// Array Destructuring:
+// const [test1, test2, test3] = require('./modules/')
 // test1()
 // test2()
 // test3()
 
+// const objFunc = require('./modules/')
+// objFunc.test1()
+// objFunc.test2()
+// objFunc.test3()
 
- /*-------------------------*/
-const objFunc =  require('./modules/index')
+// Object Desctructuring:
+const { test1, test3:func3, test2, name } = require('./modules/')
+test1()
+test2()
+func3()
+console.log(name)
 
-objFunc.test1()
-objFunc.test2()
-objFunc.test3()
 
-
- /*-----------------------------*/
-
- const {test1,test2, test3} = require('./modules/index') //objelerde destruct ederken sira önemli degildir
- 
- test1()
- test2()
- test3()
-
- /*-------------------------------*/
-
-console.log('this is module.js');
+/* -------------------------------------------- */
+/* -------------------------------------------- */
+/* -------------------------------------------- */
+/* -------------------------------------------- */
