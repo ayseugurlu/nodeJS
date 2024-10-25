@@ -122,6 +122,42 @@ router.post('/todo', async(req,res)=>{
 
 // delete update ödev
 
+// update todo
+router.put('/todo/:id', async(req,res)=> {
+    const result = await Todo.update(
+       req.body,
+        {
+          where: {
+            id:req.params.id
+          },
+        }
+    )
+
+    res.status(202).send({
+        error:false,
+        result
+    })
+})
+
+
+//delete todo
+
+router.delete('/todo/:id', async(req,res)=> {
+    await Todo.destroy(
+        {
+          where: {
+            id:req.params.id
+          },
+        }
+    )
+
+    res.status(200).send({
+        error:false
+    })
+})
+
+
+
 app.use(router)
 
 
