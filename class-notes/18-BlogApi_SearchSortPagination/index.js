@@ -50,6 +50,9 @@ app.use(authentication)
 app.use(require('./src/middlewares/authentication'))
 
 
+// Query Handler
+app.use(require('./src/middlewares/queryHandler'))
+
 // DB connection:
 require('./src/configs/dbConnection')
 
@@ -78,3 +81,6 @@ app.use(require('./src/middlewares/errorHandler'))
 
 /* ------------------------------------------------------- */
 app.listen(PORT, () => console.log('Running: http://127.0.0.1:' + PORT))
+/* ------------------------------------------------------- */
+//! Syncronization : Run it only once.
+// require('./snyc')()

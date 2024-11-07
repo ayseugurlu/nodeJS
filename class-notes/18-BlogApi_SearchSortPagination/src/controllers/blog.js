@@ -12,7 +12,7 @@ module.exports.blogCategory = {
 
     list: async (req, res) => {
 
-        const result = await BlogCategory.find()
+      
 
         res.status(200).send({
             error: false,
@@ -96,10 +96,16 @@ module.exports.blogPost = {
 
     list: async (req, res) => {
 
-        const result = await BlogPost.find()
+        // SELECT & POPULATE:
+        // const result = await BlogPost.find({...filter-search},{...select})
+       // const result = await BlogPost.find({},{categoryId:true,title:true,content:true, _id:false}).populate('categoryId')  // _id default olarak gelir yani default:true
 
+
+       const result = await res.getModelList(BlogPost, 'categoryId')  // ikinci parametre populate i temsil eder
+        
         res.status(200).send({
             error: false,
+            details: await res.getModelListDetails(BlogPost),
             result
         })
     },

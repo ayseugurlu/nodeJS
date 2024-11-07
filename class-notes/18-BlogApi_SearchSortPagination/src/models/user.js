@@ -73,10 +73,12 @@ const UserSchema = new Schema({
                 // throw new Error('Invalid Password!') // Syntax Error
                 return 'InvalidPassword'
             } else {
+                // console.log('line 76--',passwordEncrypt(password));
                 return passwordEncrypt(password)
             }
         },
         validate: (password) => {
+            // console.log('line 81--', password)
             if (password === 'InvalidPassword') {
                 return false
             } else {
