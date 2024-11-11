@@ -48,6 +48,7 @@ module.exports = async (req, res, next) => {
     res.getModelList = async function (Model, populate = null) {
 
         return await Model.find({ ...filter, ...search }).sort(sort).limit(limit).skip(skip).populate(populate)
+        
     }
 
     res.getModelListDetails = async (Model) => {
@@ -75,8 +76,6 @@ module.exports = async (req, res, next) => {
         return details
 
     }
-
-
 
     next()
 }

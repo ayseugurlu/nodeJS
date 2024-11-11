@@ -40,8 +40,15 @@ app.all('/', (req, res) => {
 
     res.send({
         message: 'WELCOME TO PERSONNEL API',
+        isLogin: req.session.id ? true : false,
+        session: req.session
     })
 })
+
+//departments
+app.use('/departments', require('./src/routes/department.js'))
+//personnels
+app.use('/personnels', require('./src/routes/personnel.js'))
 
 
 // Error Handler:

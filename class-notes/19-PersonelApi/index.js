@@ -56,7 +56,7 @@ app.use('/personnels', require('./src/routes/personnel'))
 //auth
 app.use('/auth', require('./src/routes/auth'))
 
-// Not Fpound
+// Not Found
 
 app.use('*', (req,res)=> {
     res.status(404).send({
