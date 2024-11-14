@@ -69,6 +69,7 @@ app.use('/user', require('./src/routes/user'))
 app.use('/auth', require('./src/routes/auth'))
 
 
+
 // Catch Errors:
 app.use(require('./src/middlewares/errorHandler'))
 
