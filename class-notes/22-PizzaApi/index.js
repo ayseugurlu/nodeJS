@@ -48,8 +48,6 @@ app.use(require('./src/middlewares/queryHandler'))
 /* ------------------------------------------------------- */
 // Routes:
 
-
-
 // HomePath:
 app.all('/', (req, res) => {
     res.send({
@@ -63,6 +61,26 @@ app.all('/', (req, res) => {
         user: req.user,
     })
 })
+
+// auth
+app.use('/auth', require('./src/routes/auth'))
+
+//tokens
+app.use('/tokens', require('./src/routes/token'))
+
+//users
+app.use('/users', require('./src/routes/user'))
+
+//toppings
+app.use('/toppings', require('./src/routes/topping'))
+
+//pizzas
+app.use('/pizzas', require('./src/routes/pizza'))
+
+//order
+app.use('/orders', require('./src/routes/order'))
+
+
 
 /* ------------------------------------------------------- */
 
