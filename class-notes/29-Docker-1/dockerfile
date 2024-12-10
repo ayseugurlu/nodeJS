@@ -1,0 +1,14 @@
+#Altyapi
+FROM  node:current-alpine3.21
+
+# Calisma Alani
+WORKDIR /app
+
+# COPY hello.js /app
+
+#Dosyalari aktar
+COPY . .
+
+#Komut calistir
+#CMD node hello.js
+CMD ["node", "hello.js"]

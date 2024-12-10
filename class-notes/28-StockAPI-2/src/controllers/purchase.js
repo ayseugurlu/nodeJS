@@ -1,15 +1,16 @@
-"use strict";
+"use strict"
 /* -------------------------------------------------------
     | FULLSTACK TEAM | NODEJS / EXPRESS |
 ------------------------------------------------------- */
 // Purchase Controllers:
 
-const Purchase = require("../models/purchase");
-const Product = require("../models/product");
+const Purchase = require('../models/purchase')
+const Product = require('../models/product')
 
 module.exports = {
-  list: async (req, res) => {
-    /*
+
+    list: async (req, res) => {
+        /*
             #swagger.tags = ["Purchases"]
             #swagger.summary = "List Purchases"
             #swagger.description = `
@@ -23,22 +24,18 @@ module.exports = {
             `
         */
 
-    const data = await res.getModelList(Purchase, {}, [
-      { path: "productId", select: "name -_id" },
-      { path: "brandId", select: "name -_id" },
-      { path: "firmId", select: "name -_id" },
-      { path: "userId", select: "username -_id" },
-    ]);
+        const data = await res.getModelList(Purchase, {}, ['userId', 'firmId', 'brandId', 'productId'])
 
-    res.status(200).send({
-      error: false,
-      details: await res.getModelListDetails(Purchase),
-      data,
-    });
-  },
+        res.status(200).send({
+            error: false,
+            details: await res.getModelListDetails(Purchase),
+            data
+        })
 
-  create: async (req, res) => {
-    /*
+    },
+
+    create: async (req, res) => {
+        /*
             #swagger.tags = ["Purchases"]
             #swagger.summary = "Create Purchase"
             #swagger.parameters['body'] = {
@@ -50,45 +47,38 @@ module.exports = {
             }
         */
 
-    //Set uerId from logged in user
-    req.body.userId = req.user._id;
+        // Set userId from logged in user:
+        req.body.userId = req.user._id
+        console.log(req.user);
 
-    const data = await Purchase.create(req.body);
+        const data = await Purchase.create(req.body)
 
-    // satinalma sonrasi ürün adetini arttir
+        // Satinalma sonrasi urun adetini arttir:
+        await Product.updateOne({ _id: data.productId }, { $inc: { quantity: +data.quantity } })
 
-    await Product.updateOne(
-      { _id: data.productId },
-      { $inc: { quantity: +data.quantity } }
-    );
+        res.status(201).send({
+            error: false,
+            data
+        })
+    },
 
-    res.status(201).send({
-      error: false,
-      data,
-    });
-  },
-
-  read: async (req, res) => {
-    /*
+    read: async (req, res) => {
+        /*
             #swagger.tags = ["Purchases"]
             #swagger.summary = "Get Single Purchase"
         */
 
-    const data = await Purchase.findOne({ _id: req.params.id }).populate([
-      { path: "productId", select: "name -_id" },
-      { path: "brandId", select: "name -_id" },
-      { path: "firmId", select: "name -_id" },
-      { path: "userId", select: "username -_id" },
-    ]);
+        const data = await Purchase.findOne({ _id: req.params.id }).populate(['userId', 'firmId', 'brandId', 'productId'])
 
-    res.status(200).send({
-      error: false,
-      data,
-    });
-  },
+        res.status(200).send({
+            error: false,
+            data
+        })
 
-  update: async (req, res) => {
-    /*
+    },
+
+    update: async (req, res) => {
+        /*
             #swagger.tags = ["Purchases"]
             #swagger.summary = "Update Purchase"
             #swagger.parameters['body'] = {
@@ -100,42 +90,45 @@ module.exports = {
             }
         */
 
-    if (req.body?.quantity) {
-      const currentPurchase = await Purchase.findOne({ _id: req.params.id });
-      // farki hesapla
-      const difference = req.body.quantity - currentPurchase.quantity;
-      //farki product a yansit
-      await Product.updateOne(
-        { _id: currentPurchase.productId },
-        { $inc: { quantity: +difference } }
-      );
-    }
+        if (req.body?.quantity) {
+            const currentPurchase = await Purchase.findOne({ _id: req.params.id })
 
-    const data = await Purchase.updateOne({ _id: req.params.id }, req.body, {
-      runValidators: true,
-    });
+            // Farki hesapla:        50 / 5000              500
+            const difference = req.body.quantity - currentPurchase.quantity
 
-    res.status(202).send({
-      error: false,
-      data,
-      new: await Purchase.findOne({ _id: req.params.id }),
-    });
-  },
+            // Farki producta yansit:
+            await Product.updateOne({ _id: currentPurchase.productId }, { $inc: { quantity: +difference } })
+        }
 
-  delete: async (req, res) => {
-    /*
+
+        const data = await Purchase.updateOne({ _id: req.params.id }, req.body, { runValidators: true })
+
+        res.status(202).send({
+            error: false,
+            data,
+            new: await Purchase.findOne({ _id: req.params.id })
+        })
+
+    },
+
+    delete: async (req, res) => {
+        /*
             #swagger.tags = ["Purchases"]
             #swagger.summary = "Delete Purchase"
         */
 
-    // mevcut islemdeki adet bilgisini bul
-    const currentPurchase = await Purchase.findOne({ _id: req.params.id });
+        // Mevcut islemdeki adet bilgisini bul:
+        const currentPurchase = await Purchase.findOne({ _id: req.params.id })
 
-    const data = await Purchase.deleteOne({ _id: req.params.id });
+        const data = await Purchase.deleteOne({ _id: req.params.id })
 
-    res.status(data.deletedCount ? 204 : 404).send({
-      error: !data.deletedCount,
-      data,
-    });
-  },
-};
+        await Product.updateOne({ _id: currentPurchase.productId }, { $inc: { quantity: -currentPurchase.quantity } })
+
+        res.status(data.deletedCount ? 204 : 404).send({
+            error: !data.deletedCount,
+            data
+        })
+
+    },
+
+}

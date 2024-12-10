@@ -1,17 +1,18 @@
-"use strict";
+"use strict"
 /* -------------------------------------------------------
     | FULLSTACK TEAM | NODEJS / EXPRESS |
 ------------------------------------------------------- */
 // User Controllers:
 
-const User = require("../models/user");
-const jwt = require("jsonwebtoken");
-const Token = require("../models/token");
-const passwordEncrypt = require("../helpers/passwordEncrypt");
+const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+const Token = require('../models/token')
+const passwordEncrypt = require('../helpers/passwordEncrypt')
 
 module.exports = {
-  list: async (req, res) => {
-    /* 
+    list: async (req, res) => {
+
+        /* 
             #swagger.tags = ["Users"]
             #swagger.summary = "List Users"
             #swagger.description = `
@@ -25,16 +26,20 @@ module.exports = {
             `
         */
 
-    const data = await res.getModelList(User);
+        // Sadece kendi kayıtlarını görebilir:
+        const customFilters = req.user?.isAdmin ? {} : { _id: req.user._id }
+        
+        const data = await res.getModelList(User, customFilters)
 
-    res.status(200).send({
-      error: false,
-      details: await res.getModelListDetails(User),
-      data,
-    });
-  },
-  create: async (req, res) => {
-    /* 
+        res.status(200).send({
+            error: false,
+            details: await res.getModelListDetails(User),
+            data
+        })
+    },
+    create: async (req, res) => {
+
+        /* 
             #swagger.tags = ["Users"]
             #swagger.summary = "Create User"
             #swagger.parameters['body'] = {
@@ -50,70 +55,69 @@ module.exports = {
             }
         */
 
-    // Erkan hocamizin istegi uzerine, kullanici register oldugunda login olmus olsun.
 
-    const user = await User.create(req.body);
+        // Erkan hocamizin istegi uzerine, kullanici register oldugunda login olmus olsun.
 
-    /* SIMPLE TOKEN */
-    const tokenData = await Token.create({
-      userId: user._id,
-      token: passwordEncrypt(user._id + Date.now()),
-    });
-    /* SIMPLE TOKEN */
+        const user = await User.create(req.body)
 
-    /* JWT */
+        /* SIMPLE TOKEN */
+        const tokenData = await Token.create({
+            userId: user._id,
+            token: passwordEncrypt(user._id + Date.now()),
+        });
+        /* SIMPLE TOKEN */
 
-    // AccessToken:
-    const accessData = {
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      isActive: user.isActive,
-      isAdmin: user.isAdmin,
-    };
+        /* JWT */
 
-    const accessToken = jwt.sign(accessData, process.env.ACCESS_KEY, {
-      expiresIn: "30m",
-    });
+        // AccessToken:
+        const accessData = {
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            isActive: user.isActive,
+            isAdmin: user.isAdmin
+        }
 
-    // RefreshToken:
-    const refreshData = {
-      _id: user._id,
-      password: user.password,
-    };
-    // Convert to JWT
-    const refreshToken = jwt.sign(refreshData, process.env.REFRESH_KEY, {
-      expiresIn: "1d",
-    });
-    /* JWT */
+        const accessToken = jwt.sign(accessData, process.env.ACCESS_KEY, { expiresIn: '30m' })
 
-    res.send({
-      error: false,
-      token: tokenData.token,
-      bearer: {
-        access: accessToken,
-        refresh: refreshToken,
-      },
-      user,
-    });
-  },
+        // RefreshToken:
+        const refreshData = {
+            _id: user._id,
+            password: user.password
+        }
+        // Convert to JWT
+        const refreshToken = jwt.sign(refreshData, process.env.REFRESH_KEY, { expiresIn: '1d' })
+        /* JWT */
 
-  read: async (req, res) => {
-    /* 
+        res.status(201).send({
+            error: false,
+            token: tokenData.token,
+            bearer: {
+                access: accessToken,
+                refresh: refreshToken
+            },
+            user
+        });
+    },
+
+    read: async (req, res) => {
+
+        /* 
             #swagger.tags = ["Users"]
             #swagger.summary = "Read User"
         */
 
-    const data = await User.findOne({ _id: req.params.id });
+        const data = await User.findOne({ _id: req.params.id })
 
-    res.status(200).send({
-      error: false,
-      data,
-    });
-  },
+        res.status(200).send({
+            error: false,
+            data
+        })
+    },
 
-  update: async (req, res) => {
-    /* 
+    update: async (req, res) => {
+
+        /* 
             #swagger.tags = ["Users"]
             #swagger.summary = "Update User"
             #swagger.parameters['body'] = {
@@ -129,28 +133,27 @@ module.exports = {
             }
         */
 
-    const data = await User.updateOne({ _id: req.params.id }, req.body, {
-      runValidators: true,
-    });
+        const data = await User.updateOne({ _id: req.params.id }, req.body, { runValidators: true })
 
-    res.status(200).send({
-      error: false,
-      data,
-      new: await User.findOne({ _id: req.params.id }),
-    });
-  },
+        res.status(200).send({
+            error: false,
+            data,
+            new: await User.findOne({ _id: req.params.id })
+        })
+    },
 
-  delete: async (req, res) => {
-    /* 
+    delete: async (req, res) => {
+
+        /* 
             #swagger.tags = ["Users"]
             #swagger.summary = "Delete User"
         */
 
-    const data = await User.deleteOne({ _id: req.params.id });
+        const data = await User.deleteOne({ _id: req.params.id })
 
-    res.status(data.deletedCount ? 204 : 404).send({
-      error: !data.deletedCount,
-      data,
-    });
-  },
-};
+        res.status(data.deletedCount ? 204 : 404).send({
+            error: !data.deletedCount,
+            data
+        })
+    },
+}
